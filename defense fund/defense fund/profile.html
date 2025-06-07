@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Profile</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to bottom right, #00b894, #0984e3);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .dashboard {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border-radius: 20px;
+      padding: 2.5rem;
+      width: 90%;
+      max-width: 500px;
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .dashboard h2 {
+      text-align: center;
+      margin-bottom: 1rem;
+      font-size: 2rem;
+    }
+
+    .dashboard p {
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+
+    .dashboard label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+
+    .dashboard input {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 10px;
+      margin-bottom: 1.5rem;
+      font-size: 1rem;
+    }
+
+    .dashboard button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background-color: #fff;
+      color: #00b894;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .dashboard button.logout {
+      background-color: #ff6b6b;
+      color: white;
+      margin-top: 20px;
+    }
+
+    #statusMessage {
+      text-align: center;
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard">
+    <h2>👤 My Profile</h2>
+    <p><strong>Name:</strong> <span id="displayName">Loading...</span></p>
+    <p><strong>Email:</strong> <span id="displayEmail">Loading...</span></p>
+    <p><strong>Role:</strong> <span id="displayRole">Loading...</span></p>
+
+    <label for="newPassword">Change Password</label>
+    <input type="password" id="newPassword" placeholder="New Password" />
+
+    <button onclick="changePassword()">🔐 Update Password</button>
+    <button class="logout" onclick="logout()">🚪 Logout</button>
+
+    <p id="statusMessage"></p>
+  </div>
+
+  <script type="module">
+    import {
+      getAuth,
+      onAuthStateChanged,
+      updatePassword,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc
+    } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
+    import { auth, db } from "./firebase-config.js";
+
+    const nameSpan = document.getElementById("displayName");
+    const emailSpan = document.getElementById("displayEmail");
+    const roleSpan = document.getElementById("displayRole");
+    const status = document.getElementById("statusMessage");
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      emailSpan.textContent = user.email;
+
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if (userDoc.exists()) {
+        const data = userDoc.data();
+        nameSpan.textContent = data.name || "Not set";
+        roleSpan.textContent = data.role || "Donor";
+      } else {
+        nameSpan.textContent = "No user doc";
+        roleSpan.textContent = "Unknown";
+      }
+    });
+
+    window.changePassword = async () => {
+      const newPassword = document.getElementById("newPassword").value;
+      const user = auth.currentUser;
+
+      if (!newPassword || newPassword.length < 6) {
+        status.textContent = "❌ Password must be at least 6 characters.";
+        status.style.color = "red";
+        return;
+      }
+
+      try {
+        await updatePassword(user, newPassword);
+        status.textContent = "✅ Password updated successfully!";
+        status.style.color = "lightgreen";
+      } catch (error) {
+        status.textContent = "❌ " + error.message;
+        status.style.color = "red";
+      }
+    };
+
+    window.logout = async () => {
+      await signOut(auth);
+      window.location.href = "login.html";
+    };
+  </script>
+</body>
+</html>

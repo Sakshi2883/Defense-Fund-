@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .dashboard-container {
+      max-width: 600px;
+      margin: 100px auto;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    .dashboard-container h2 {
+      margin-bottom: 1rem;
+      color: #4b2e83;
+    }
+    .dashboard-container p {
+      font-size: 1.1rem;
+      margin-bottom: 0.7rem;
+    }
+  </style>
+
+  <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCRX9Na3ApjoGfJrZ93WET8ZeUTvjwRX6M",
+      authDomain: "defence-fund-blockchain.firebaseapp.com",
+      projectId: "defence-fund-blockchain",
+      storageBucket: "defence-fund-blockchain.firebasestorage.app",
+      messagingSenderId: "558788281694",
+      appId: "1:558788281694:web:b92925895dd69f3299bbcf",
+      measurementId: "G-HDYQYXPV2D"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const container = document.createElement("div");
+    container.className = "dashboard-container";
+    document.body.appendChild(container);
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      const docRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        container.innerHTML = `
+          <h2>Welcome, <span id="username">Loading...</span> 👋</h2>
+          <p>Email: <span id="useremail">Loading...</span></p>
+          <p><strong>Role:</strong> ${data.role}</p>
+          <p><strong>Joined:</strong> ${new Date(data.createdAt.seconds * 1000).toLocaleDateString()}</p>
+          <button id="logoutBtn">🚪 Logout</button>
+        `;
+
+        document.getElementById("logoutBtn").onclick = () => {
+          signOut(auth).then(() => {
+            window.location.href = "login.html";
+          });
+        };
+      } else {
+        container.innerHTML = "<p>⚠️ No user data found.</p>";
+      }
+    });
+  </script>
+</head>
+<body></body>
+</html>

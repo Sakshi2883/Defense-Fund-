@@ -1,0 +1,195 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Track Donations</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <header>
+    <div class="navbar">
+      <a href="index.html">🏠 Home</a>
+      <a href="about.html">📖 About</a>
+      <a href="donate.html">💸 Donate</a>
+      <a href="track.html" class="active">📊 Track</a>
+    </div>
+  </header>
+
+  <style>
+    body {
+      background: linear-gradient(to right, #f8f9fa, #e0e0e0);
+      font-family: 'Segoe UI', sans-serif;
+      padding: 40px;
+      text-align: center;
+    }
+
+    h2 {
+      font-size: 2em;
+      margin: 20px 0;
+      color: #333;
+    }
+
+    .table-container {
+      max-width: 900px;
+      margin: auto;
+      margin-bottom: 40px;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #2c3e50;
+      color: white;
+    }
+
+    .chart-container {
+      max-width: 900px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    canvas {
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <h2>📢 Real-Time Donation Feed</h2>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Amount (INR)</th>
+          <th>Date</th>
+          <th>Payment ID</th>
+        </tr>
+      </thead>
+      <tbody id="donationTable">
+        <tr><td colspan="4">Loading donations...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>📈 Donation Trends</h2>
+  <div class="chart-container">
+    <canvas id="donationChart"></canvas>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+    import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCRX9Na3ApjoGfJrZ93WET8ZeUTvjwRX6M",
+      authDomain: "defence-fund-blockchain.firebaseapp.com",
+      projectId: "defence-fund-blockchain",
+      storageBucket: "defence-fund-blockchain.appspot.com",
+      messagingSenderId: "558788281694",
+      appId: "1:558788281694:web:b92925895dd69f3299bbcf",
+      measurementId: "G-HDYQYXPV2D"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const table = document.getElementById("donationTable");
+
+    const ctx = document.getElementById("donationChart").getContext("2d");
+    const chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Donations (INR)',
+          data: [],
+          backgroundColor: '#3498db',
+          borderRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          x: {
+            title: { display: true, text: 'Date/Time' },
+            ticks: { maxRotation: 50, minRotation: 30 }
+          },
+          y: {
+            beginAtZero: true,
+            title: { display: true, text: 'Amount (INR)' }
+          }
+        }
+      }
+    });
+
+    const donationRef = query(collection(db, "donations"), orderBy("timestamp", "desc"));
+
+    onSnapshot(donationRef, snapshot => {
+      table.innerHTML = "";
+      const labels = [];
+      const data = [];
+
+      snapshot.forEach(doc => {
+        const donation = doc.data();
+        const dateStr = donation.timestamp?.toDate().toLocaleString() || "N/A";
+        const row = `
+          <tr>
+            <td>${donation.name || "Anonymous"}</td>
+            <td>₹${donation.amount}</td>
+            <td>${dateStr}</td>
+            <td>${donation.paymentId || "N/A"}</td>
+          </tr>
+        `;
+        table.innerHTML += row;
+
+        if (donation.timestamp && donation.amount) {
+          labels.unshift(new Date(donation.timestamp.toDate()).toLocaleString());
+          data.unshift(donation.amount);
+        }
+      });
+
+      chart.data.labels = labels;
+      chart.data.datasets[0].data = data;
+      chart.update();
+    });
+  </script>
+   <!-- Chatbot -->
+   <style>
+    df-messenger {
+      --df-messenger-bot-message: #f3f4fa;
+      --df-messenger-button-titlebar-color: #f9a825;
+      --df-messenger-chat-background-color: #fefefe;
+      --df-messenger-font-color: #000;
+      --df-messenger-send-icon: #1a237e;
+    }
+  </style>
+  <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
+  <df-messenger
+    intent="WELCOME"
+    chat-title="DefenseBot"
+    agent-id="daf82c86-d822-492b-830b-b8b328be4623"
+    language-code="en"
+    chat-icon="https://cdn-icons-png.flaticon.com/512/2354/2354573.png"
+  ></df-messenger>
+
+</body>
+</html>

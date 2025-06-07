@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      height: 100vh;
+    }
+
+    .container {
+      display: flex;
+      width: 100%;
+    }
+
+    .register-section {
+      flex: 1;
+      background-color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+    }
+
+    .register-section h2 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    .register-form {
+      width: 100%;
+      max-width: 350px;
+    }
+
+    .register-form input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+
+    .register-form button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background: #00b894;
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .register-form button:hover {
+      background: #019875;
+    }
+
+    .right-panel {
+      flex: 1;
+      background: linear-gradient(to bottom right, #00b894, #0984e3);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+    }
+
+    .right-panel h2 {
+      font-size: 2.2rem;
+      margin-bottom: 10px;
+    }
+
+    .right-panel p {
+      font-size: 1.1rem;
+      max-width: 300px;
+      text-align: center;
+    }
+
+    .right-panel a {
+      margin-top: 20px;
+      padding: 10px 30px;
+      background-color: white;
+      color: #00b894;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    #verification-message {
+      display: none;
+      color: green;
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    #registerError {
+      color: red;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="register-section">
+      <h2>Create an Account</h2>
+      <form id="registerForm" class="register-form">
+        <input type="text" id="name" placeholder="Full Name" required />
+        <input type="email" id="email" placeholder="Email" required />
+        <input type="password" id="password" placeholder="Password" required />
+        <button type="submit">Register</button>
+        <p id="registerError"></p>
+      </form>
+      <div id="verification-message">✅ A verification email has been sent! Please check your inbox.</div>
+      <a href="login.html">Already have an account? Login</a>
+    </div>
+
+    <div class="right-panel">
+      <h2>Welcome Back!</h2>
+      <p>To keep connected with us, please login with your personal info</p>
+      <a href="login.html">Login</a>
+    </div>
+  </div>
+
+  <script type="module" src="firebase-config.js"></script>
+  <script type="module">
+    import {
+      createUserWithEmailAndPassword,
+      sendEmailVerification
+    } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
+    import {
+      doc,
+      setDoc,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
+    import { auth, db } from "./firebase-config.js";
+
+    const form = document.getElementById("registerForm");
+    const msg = document.getElementById("verification-message");
+    const errBox = document.getElementById("registerError");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        await setDoc(doc(db, "users", user.uid), {
+          name,
+          email,
+          createdAt: serverTimestamp()
+        });
+
+        await sendEmailVerification(user);
+        msg.style.display = "block";
+        errBox.textContent = "";
+      } catch (error) {
+        errBox.textContent = "❌ " + error.message;
+      }
+    });
+  </script>
+</body>
+</html>

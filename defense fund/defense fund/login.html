@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      height: 100vh;
+    }
+    .container {
+      display: flex;
+      width: 100%;
+    }
+    .login-section {
+      flex: 1;
+      background-color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+    }
+    .login-section h2 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+    .login-section p {
+      color: #888;
+      margin-bottom: 20px;
+    }
+    .social-icons {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .social-icons a {
+      display: inline-block;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 45px;
+      font-size: 1.2rem;
+      color: white;
+      text-decoration: none;
+    }
+    .fb { background-color: #3b5998; }
+    .gplus { background-color: #db4437; }
+    .linkedin { background-color: #0077b5; }
+    .divider {
+      margin: 20px 0;
+      display: flex;
+      align-items: center;
+      color: #aaa;
+    }
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #ddd;
+      margin: 0 10px;
+    }
+    .login-form {
+      width: 100%;
+      max-width: 350px;
+    }
+    .login-form input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 1rem;
+    }
+    .login-form button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background: #00b894;
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .login-form button:hover {
+      background: #019875;
+    }
+    .right-panel {
+      flex: 1;
+      background: linear-gradient(to bottom right, #00b894, #0984e3);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+    }
+    .right-panel h2 {
+      font-size: 2.2rem;
+      margin-bottom: 10px;
+    }
+    .right-panel p {
+      font-size: 1.1rem;
+      max-width: 300px;
+      text-align: center;
+    }
+    .right-panel a {
+      margin-top: 20px;
+      padding: 10px 30px;
+      background-color: white;
+      color: #00b894;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="login-section">
+      <h2>Login to Your Account</h2>
+      <p>Login using social networks</p>
+      <div class="social-icons">
+        <a href="https://facebook.com" class="fb" target="_blank" title="Login with Facebook">f</a>
+        <a href="https://accounts.google.com/" class="gplus" target="_blank" title="Login with Google">G+</a>
+        <a href="https://linkedin.com" class="linkedin" target="_blank" title="Login with LinkedIn">in</a>
+      </div>
+      <div class="divider">OR</div>
+      <form id="loginForm" class="login-form">
+        <input type="email" id="email" placeholder="Email" required />
+        <input type="password" id="password" placeholder="Password" required />
+        <button type="submit">Sign In</button>
+        <p id="loginError" style="color:red; text-align:center;"></p>
+        <a href="forgot-password.html" style="text-align:center;"> forget your password </a>  
+      </form>
+    </div>
+    <div class="right-panel">
+      <h2>New Here?</h2>
+      <p>Sign up and discover a great amount of new opportunities!</p>
+      <a href="register.html">Sign Up</a>
+    </div>
+  </div>
+
+  <script type="module" src="firebase-config.js"></script>
+  <script type="module">
+    import {
+      getAuth,
+      signInWithEmailAndPassword
+    } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
+    import { auth } from './firebase-config.js';
+
+    const form = document.getElementById("loginForm");
+    const errorBox = document.getElementById("loginError");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        if (!user.emailVerified) {
+          errorBox.textContent = "⚠️ Please verify your email before logging in.";
+          return;
+        }
+
+        window.location.href = "index.html";
+      } catch (error) {
+        errorBox.textContent = "❌ " + error.message;
+      }
+    });
+  </script>
+</body>
+</html>

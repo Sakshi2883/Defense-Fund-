@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About Us - Defense Fund</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <div class="navbar">
+      <a href="index.html">🏠 Home</a>
+      <a href="about.html" class="active">📖 About</a>
+      <a href="donate.html">💸 Donate</a>
+      <a href="track.html">📊 Track</a>
+    </div>
+  </header>
+  
+  <main class="about-main">
+    <section class="mission-section">
+      <h2>🎯 Mission and Vision</h2>
+      <p>
+        Our mission is to enhance transparency and accountability in defense funding. We envision a future where every contribution is tracked, verified, and valued through the power of blockchain technology.
+      </p>
+    </section>
+
+    <section class="heroes-section">
+      <h2>🫡 Honoring Our Heroes</h2>
+      <p class="subtitle">Meet the brave individuals whose legacy we honor and protect through transparent support.</p>
+      <div class="flip-card-container">
+        <div class="flip-card">
+          <div class="flip-card-inner">
+            <div class="flip-card-front">
+              <img src="images/Soldier1.jpg" alt="Captain Aryan" />
+              <h3>Captain Aryan</h3>
+              <p>Special Ops</p>
+            </div>
+            <div class="flip-card-back">
+              <p>"Fearless and fierce in every mission."</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flip-card">
+          <div class="flip-card-inner">
+            <div class="flip-card-front">
+              <img src="images/Soldier2.jpg" alt="Lieutenant Ayesha" />
+              <h3>Lieutenant Ayesha</h3>
+              <p>Communications</p>
+            </div>
+            <div class="flip-card-back">
+              <p>"Her voice led entire battalions to safety."</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flip-card">
+          <div class="flip-card-inner">
+            <div class="flip-card-front">
+              <img src="images/Soldier3.jpg" alt="Sergeant Karan" />
+              <h3>Sergeant Karan</h3>
+              <p>Recon Unit</p>
+            </div>
+            <div class="flip-card-back">
+              <p>"Eyes sharp as an eagle, heart strong as a lion."</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Defense Fund. All rights reserved.</p>
+  </footer>
+  <style>
+    /* Mission & Vision Section */
+.mission-section,
+.blockchain-section {
+  padding: 60px 30px;
+  text-align: center;
+  background-color: #f9f8fd;
+  border-radius: 20px;
+  margin: 40px auto;
+  max-width: 1000px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+  transition: transform 0.3s ease;
+}
+
+.mission-section:hover,
+.blockchain-section:hover {
+  transform: scale(1.02);
+}
+
+.mission-section h2,
+.blockchain-section h2 {
+  font-size: 2.2rem;
+  color: #3c096c;
+  margin-bottom: 1rem;
+}
+
+.mission-section p,
+.blockchain-section p {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: #444;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+  </style>
+  <style>
+  /* Hero Section Styles */
+.heroes-section {
+  padding: 60px 20px;
+  text-align: center;
+  background: linear-gradient(to right, #f1f3f6, #fff);
+}
+
+.heroes-section h2 {
+  font-size: 2.5rem;
+  color: #4b2e83;
+  margin-bottom: 0.5rem;
+}
+
+.heroes-section .subtitle {
+  color: #555;
+  font-size: 1.1rem;
+  margin-bottom: 3rem;
+}
+
+.flip-card-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+
+/* Flip Card Base */
+.flip-card {
+  background: transparent;
+  width: 260px;
+  height: 360px;
+  perspective: 1000px;
+}
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
+}
+
+.flip-card:hover .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front,
+.flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.flip-card-front {
+  background-color: #fff;
+}
+
+.flip-card-front img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid #4b2e83;
+  margin-bottom: 1rem;
+}
+
+.flip-card-front h3 {
+  font-size: 1.2rem;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.flip-card-front p {
+  font-size: 1rem;
+  color: #666;
+}
+
+.flip-card-back {
+  background-color: #4b2e83;
+  color: #fff;
+  transform: rotateY(180deg);
+  text-align: center;
+}
+
+.flip-card-back p {
+  font-size: 1rem;
+  padding: 0 10px;
+  line-height: 1.4;
+}
+</style>
+<style>
+  .mission-section,
+.blockchain-section,
+.heroes-section {
+  opacity: 0;
+  animation: fadeIn 1s ease forwards;
+  animation-delay: 0.3s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+</style>
+ <!-- Chatbot -->
+ <style>
+  df-messenger {
+    --df-messenger-bot-message: #f3f4fa;
+    --df-messenger-button-titlebar-color: #f9a825;
+    --df-messenger-chat-background-color: #fefefe;
+    --df-messenger-font-color: #000;
+    --df-messenger-send-icon: #1a237e;
+  }
+</style>
+<script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
+<df-messenger
+  intent="WELCOME"
+  chat-title="DefenseBot"
+  agent-id="daf82c86-d822-492b-830b-b8b328be4623"
+  language-code="en"
+  chat-icon="https://cdn-icons-png.flaticon.com/512/2354/2354573.png"
+></df-messenger>
+
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Defense Fund | Home</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>  
+    <div class="navbar">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <img src="https://cdn-icons-png.flaticon.com/512/854/854878.png" alt="Logo" style="width: 36px; height: 36px;">
+        <span style="font-size: 1.4em; font-weight: bold;">Defense Fund</span>
+      </div>
+      <nav>
+        <a href="index.html">🏠 Home</a>
+        <a href="about.html">📘 About</a>
+        <a href="donate.html">💳 Donate</a>
+        <a href="track.html">📊 Track</a>
+      </nav>
+      <div class="auth-links">
+        <span id="user-info" style="margin-right: 1rem; font-weight: 600;"></span>
+        <button id="logoutBtn" class="logout-btn">🔓 Logout</button>
+      </div>  
+    </div>
+  </header>
+
+  <script>
+    const currentPage = location.pathname.split("/").pop();
+    const navLinks = document.querySelectorAll(".navbar nav a");
+    navLinks.forEach(link => {
+      if (link.getAttribute("href") === currentPage) {
+        link.classList.add("active");
+      }
+    });
+  </script>
+
+  <section class="hero-section" id="hero">
+    <h1 id="typed-text" style="font-size: 2.5rem; color: #fff; font-weight: bold;"></h1>
+    <a href="donate.html" class="donate-button">💖 Donate Now</a>
+  </section>
+
+  <section class="highlight" data-aos="fade-left" style="align-items: center;">
+    <h3>🌐 Explore the Impact</h3>
+    <p>Get insights into how your donation supports missions, veterans, and their families in real-time.</p>
+    <a href="track.html" class="btn">Track Impact</a>
+  </section>
+
+  <section class="testimonials" data-aos="fade-right" style="align-items: center;">
+    <h3>💬 Voices of Gratitude</h3>
+    <blockquote>
+      "This platform restored my trust in donations. I saw exactly where my money went."<br>
+      <span>- Alex D., Veteran Supporter</span>
+    </blockquote>
+    <blockquote>
+      "Transparency is everything. Blockchain made me feel part of something bigger."<br>
+      <span>- Jamie L., Donor</span>
+    </blockquote>
+  </section>
+
+  <footer data-aos="fade-up">
+    <p>&copy; 2025 Defense Fund Project. Built with ❤️ Artificial Intelliigence & Machine learning</p>
+  </footer>
+
+  <button id="backToTop" title="Go to top">⬆️</button>
+
+  <!-- Scripts -->
+  <script src="script.js"></script>
+  <script>
+    window.onscroll = () => {
+      document.getElementById("backToTop").style.display = window.scrollY > 300 ? "block" : "none";
+    };
+    document.getElementById("backToTop").onclick = () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+  </script>
+
+  <script>
+    new Typed('#typed-text', {
+      strings: [
+        'Empower Heroes.',
+        'Track Every Donation.',
+        'Support Real Impact.'
+      ],
+      typeSpeed: 50,
+      backSpeed: 25,
+      loop: true
+    });
+  </script>
+
+  <script>AOS.init({ duration: 1000, once: true });</script>
+
+  <!-- Chatbot -->
+  <style>
+    df-messenger {
+      --df-messenger-bot-message: #f3f4fa;
+      --df-messenger-button-titlebar-color: #f9a825;
+      --df-messenger-chat-background-color: #fefefe;
+      --df-messenger-font-color: #000;
+      --df-messenger-send-icon: #1a237e;
+    }
+  </style>
+  <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
+  <df-messenger
+    intent="WELCOME"
+    chat-title="DefenseBot"
+    agent-id="daf82c86-d822-492b-830b-b8b328be4623"
+    language-code="en"
+    chat-icon="https://cdn-icons-png.flaticon.com/512/2354/2354573.png"
+  ></df-messenger>
+
+  <script>
+    document.querySelector(".donate-button").addEventListener("click", function(e) {
+      e.preventDefault();
+      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+      setTimeout(() => {
+        window.location.href = "#donate";
+      }, 400);
+    });
+  </script>
+
+  <script>
+    const images = [
+      'images/team.jpg',
+      'images/army.jpeg',
+      'images/defence.jpeg'
+    ];
+    let index = 0;
+    const hero = document.getElementById("hero");
+    function changeBackground() {
+      hero.style.backgroundImage = `url('${images[index]}')`;
+      index = (index + 1) % images.length;
+    }
+    changeBackground();
+    setInterval(changeBackground, 5000);
+  </script>
+
+  <script type="module">
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCRX9Na3ApjoGfJrZ93WET8ZeUTvjwRX6M",
+      authDomain: "defence-fund-blockchain.firebaseapp.com",
+      projectId: "defence-fund-blockchain",
+      storageBucket: "defence-fund-blockchain.appspot.com",
+      messagingSenderId: "558788281694",
+      appId: "1:558788281694:web:b92925895dd69f3299bbcf",
+      measurementId: "G-HDYQYXPV2D"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const userInfoBox = document.getElementById("user-info");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        const name = userDoc.exists() ? userDoc.data().name : "User";
+
+        userInfoBox.innerHTML = `👋 <strong>${name}</strong> | <a href="profile.html" style="color:#00f; font-weight:500;">My Profile</a>`;
+      } else {
+        userInfoBox.innerHTML = `<a href="login.html" style="color:#fff;">Login</a>`;
+      }
+    });
+
+    logoutBtn.addEventListener("click", async () => {
+      await signOut(auth);
+      window.location.href = "login.html";
+    });
+  </script>
+</body>
+</html>

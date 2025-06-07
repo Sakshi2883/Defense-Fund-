@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Donate | Defense Fund</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1>💸 Make a Difference with Every Contribution</h1>
+    <div class="navbar">
+      <a href="index.html">🏠 Home</a>
+      <a href="about.html">📖 About</a>
+      <a href="donate.html" class="active">💸 Donate</a>
+      <a href="track.html">📊 Track</a>
+    </div>
+  </header>
+
+  <section class="donation-section" style="text-align: center; max-width: 600px; margin: auto;">
+    <h2>🔐 Support Our Defense Heroes</h2>
+    <p>Your donation makes a transparent and impactful difference.</p>
+
+    <input type="text" id="name" placeholder="Your Name" required />
+    <input type="email" id="email" placeholder="Your Email" required />
+    <input type="number" id="amount" placeholder="Enter amount (₹)" min="1" required /><br><br>
+    <textarea id="message" placeholder="Leave a message..."></textarea><br><br>
+    <button id="donateBtn">Donate</button><br><br>
+    <small style="color:gray; margin-top:-10px; display:block;">Minimum ₹10 suggested</small>
+  </section>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCRX9Na3ApjoGfJrZ93WET8ZeUTvjwRX6M",
+      authDomain: "defence-fund-blockchain.firebaseapp.com",
+      projectId: "defence-fund-blockchain",
+      storageBucket: "defence-fund-blockchain.appspot.com",
+      messagingSenderId: "558788281694",
+      appId: "1:558788281694:web:b92925895dd69f3299bbcf",
+      measurementId: "G-HDYQYXPV2D"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    emailjs.init("ov9qKeJIeN_CHw8XO");
+
+    document.getElementById("donateBtn").addEventListener("click", async () => {
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const message = document.getElementById("message").value;
+      const amount = parseInt(document.getElementById("amount").value);
+
+      if (!amount || amount <= 0) {
+        alert("Please enter a valid amount");
+        return;
+      }
+
+      const options = {
+        key: "rzp_test_1DP5mmOlF5G5ag",
+        amount: amount * 100,
+        currency: "INR",
+        name: "Defense Donation",
+        description: "Support Our Heroes",
+        image: "https://cdn-icons-png.flaticon.com/512/854/854878.png",
+        handler: async function (response) {
+          let sentiment = "neutral";
+
+          try {
+            const result = await fetch("https://api-inference.huggingface.co/models/j-hartmann/emotion-english-distilroberta-base", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer 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"
+              },
+              body: JSON.stringify({ inputs: message })
+            });
+            const prediction = await result.json();
+            sentiment = prediction[0]?.[0]?.label?.toLowerCase() || "neutral";
+          } catch (error) {
+            console.error("Sentiment detection error:", error);
+          }
+
+          try {
+            await addDoc(collection(db, "donations"), {
+              name,
+              email,
+              amount,
+              currency: "INR",
+              message,
+              sentiment,
+              paymentId: response.razorpay_payment_id,
+              timestamp: new Date()
+            });
+          } catch (err) {
+            console.error("❌ Firestore Error:", err);
+          }
+
+          emailjs.send("service_xioo9rq", "template_xm6za73", {
+            name,
+            email,
+            amount,
+            paymentId: response.razorpay_payment_id
+          }).then(result => {
+            console.log("📧 Email sent:", result.text);
+          }, error => {
+            console.error("❌ EmailJS error:", error);
+          });
+
+          window.location.href = `thankyou.html?name=${encodeURIComponent(name)}&amount=₹${amount}&msg=${encodeURIComponent(message)}&sentiment=${sentiment}&paymentId=${response.razorpay_payment_id}`;
+        },
+        theme: { color: "#F37254" }
+      };
+
+      const paymentObject = new Razorpay(options);
+      paymentObject.open();
+    });
+  </script>
+</body>
+</html>

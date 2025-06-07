@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thank You</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <style>
+    .thankyou-box {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 2rem;
+      border-radius: 15px;
+      text-align: center;
+      color: white;
+      margin-top: 5rem;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    }
+    .thankyou-box h1 {
+      font-size: 2.5rem;
+      color: gold;
+    }
+    .thankyou-box p {
+      margin: 1rem 0;
+      font-size: 1.2rem;
+    }
+    .btn {
+      margin-top: 2rem;
+      padding: 0.7rem 1.5rem;
+      background: deeppink;
+      color: white;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    #receiptLink {
+      margin-right: 1rem;
+    }
+  </style>
+</head>
+<body style="background: radial-gradient(#1a2a3a, #0f1115); font-family: 'Segoe UI', sans-serif;">
+  <div class="thankyou-box">
+    <h1>🎉 Thank You!</h1>
+    <p id="thankMessage">Processing your donation...</p>
+    <p id="donorMsg"></p>
+    <p id="emotionResult"></p>
+    <a id="receiptLink" class="btn" style="display: none;">📄 View Receipt</a>
+    <a href="index.html" class="btn">🔙 Back to Home</a>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const name = urlParams.get('name') || 'Donor';
+    const amount = urlParams.get('amount') || 'an amazing';
+    const message = urlParams.get('msg') || '';
+    const paymentId = urlParams.get('paymentId');
+    const sentiment = urlParams.get('sentiment');
+
+    document.getElementById("thankMessage").textContent = `Dear ${name}, thank you for donating ₹${amount}!`;
+    document.getElementById("donorMsg").innerHTML = message ? `📝 Your message: "${message}"` : '';
+
+    const receiptLink = document.getElementById("receiptLink");
+    if (paymentId) {
+      receiptLink.href = `receipt.html?paymentId=${paymentId}`;
+      receiptLink.style.display = 'inline-block';
+    }
+
+    const sentimentText = document.getElementById("emotionResult");
+
+    const emojiMap = {
+      joy: '😊',
+      sadness: '😢',
+      anger: '😠',
+      fear: '😨',
+      surprise: '😲',
+      love: '❤️',
+      neutral: '😐'
+    };
+
+    const joyKeywords = [
+      "happy", "joy", "grateful", "thankful", "excited", "awesome",
+      "great", "smile", "smiling", "blessed", "thank you",
+      "wonderful", "love", "incredible", "amazing", "support", "made my day"
+    ];
+
+    function detectJoyKeywords(text) {
+      const lower = text.toLowerCase();
+      return joyKeywords.some(word => lower.includes(word));
+    }
+
+    async function analyzeEmotionWithOverride(input) {
+      if (detectJoyKeywords(input)) {
+        sentimentText.innerHTML = `💖 Our AI thinks you're feeling: <strong style="color: #00ffaa;">${emojiMap['joy']} Joy</strong>`;
+        return;
+      }
+
+      try {
+        const response = await axios.post(
+          'https://api-inference.huggingface.co/models/nateraw/bert-base-uncased-emotion',
+          { inputs: input },
+          {
+            headers: {
+              Authorization: 'Bearer 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'
+            }
+          }
+        );
+        const results = response.data[0];
+        const top = results.reduce((a, b) => a.score > b.score ? a : b);
+        const emo = top.label.toLowerCase();
+        sentimentText.innerHTML = `💖 Our AI thinks you're feeling: <strong style="color: #00ffaa;">${emojiMap[emo] || '🤔'} ${top.label}</strong>`;
+      } catch (error) {
+        console.error('Emotion detection failed:', error);
+        sentimentText.textContent = '⚠️ Could not detect emotion.';
+      }
+    }
+
+    if (!sentiment || sentiment === "analyze") {
+      if (message.trim() !== "") {
+        analyzeEmotionWithOverride(message);
+      } else {
+        sentimentText.textContent = '⚠️ No message to analyze.';
+      }
+    } else {
+      sentimentText.innerHTML = `💖 Our AI thinks you're feeling: <strong style="color: #00ffaa;">${emojiMap[sentiment.toLowerCase()] || '🤔'} ${sentiment}</strong>`;
+    }
+  </script>
+</body>
+</html>

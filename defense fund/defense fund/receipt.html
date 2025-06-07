@@ -1,0 +1,103 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Donation Receipt</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      background-color: #f4f4f9;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 40px;
+      text-align: center;
+    }
+    .receipt-container {
+      max-width: 600px;
+      margin: auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #2c3e50;
+      margin-bottom: 20px;
+    }
+    .info-row {
+      margin: 12px 0;
+      font-size: 1.1em;
+    }
+    .info-row span {
+      font-weight: bold;
+      color: #34495e;
+    }
+    .btn {
+      display: inline-block;
+      margin-top: 30px;
+      padding: 12px 24px;
+      background: #3498db;
+      color: white;
+      text-decoration: none;
+      border-radius: 30px;
+      transition: background 0.3s;
+    }
+    .btn:hover {
+      background: #2980b9;
+    }
+  </style>
+</head>
+<body>
+  <div class="receipt-container" id="receipt">
+    <h2>🧾 Donation Receipt</h2>
+    <div class="info-row">Name: <span id="donorName">Loading...</span></div>
+    <div class="info-row">Email: <span id="donorEmail">Loading...</span></div>
+    <div class="info-row">Amount: <span id="donationAmount">Loading...</span></div>
+    <div class="info-row">Payment ID: <span id="paymentId">Loading...</span></div>
+    <div class="info-row">Date: <span id="donationDate">Loading...</span></div>
+    <a href="index.html" class="btn">🏠 Back to Home</a>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCRX9Na3ApjoGfJrZ93WET8ZeUTvjwRX6M",
+      authDomain: "defence-fund-blockchain.firebaseapp.com",
+      projectId: "defence-fund-blockchain",
+      storageBucket: "defence-fund-blockchain.appspot.com",
+      messagingSenderId: "558788281694",
+      appId: "1:558788281694:web:b92925895dd69f3299bbcf",
+      measurementId: "G-HDYQYXPV2D"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentId = urlParams.get("paymentId");
+    if (paymentId) {
+      document.getElementById("paymentId").textContent = paymentId;
+
+      const donationsRef = collection(db, "donations");
+      const q = query(donationsRef, where("paymentId", "==", paymentId));
+      getDocs(q).then(snapshot => {
+        if (!snapshot.empty) {
+          const data = snapshot.docs[0].data();
+          document.getElementById("donorName").textContent = data.name || "Anonymous";
+          document.getElementById("donorEmail").textContent = data.email || "N/A";
+          document.getElementById("donationAmount").textContent = "₹" + data.amount;
+          document.getElementById("donationDate").textContent = data.timestamp?.toDate().toLocaleString() || "N/A";
+        } else {
+          document.getElementById("receipt").innerHTML = "<h2>❌ Receipt Not Found</h2><p>No donation found for this Payment ID.</p>";
+        }
+      }).catch(error => {
+        console.error("❌ Error loading receipt:", error);
+      });
+    } else {
+      document.getElementById("receipt").innerHTML = "<h2>❌ Invalid Link</h2><p>Missing payment ID in URL.</p>";
+    }
+  </script>
+</body>
+</html>
